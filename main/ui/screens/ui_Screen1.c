@@ -953,7 +953,7 @@ lv_obj_set_align( ui_Label4, LV_ALIGN_CENTER );
 lv_label_set_text(ui_Label4,"PCB阻值");
 
 ui_SliderSetRPcb = lv_slider_create(ui_Container3);
-lv_slider_set_range(ui_SliderSetRPcb, 100,1000);
+lv_slider_set_range(ui_SliderSetRPcb, 50,1000);
 lv_slider_set_value( ui_SliderSetRPcb, 0, LV_ANIM_OFF);
 if (lv_slider_get_mode(ui_SliderSetRPcb)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_SliderSetRPcb, 0, LV_ANIM_OFF);
 lv_obj_set_width( ui_SliderSetRPcb, 65);
