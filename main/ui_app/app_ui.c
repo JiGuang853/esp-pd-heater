@@ -349,7 +349,8 @@ static void chart_draw_event_cb(lv_event_t *e) {
         lv_snprintf(dsc->text, dsc->text_length, "%s", px[dsc->value]);
     }
     if (dsc->id == LV_CHART_AXIS_SECONDARY_Y) {
-        lv_snprintf(dsc->text, dsc->text_length, "%d", dsc->value / 100);
+lv_snprintf(dsc->text, dsc->text_length, "%ld", dsc->value / 100);
+
     }
 }
 
