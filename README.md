@@ -10,7 +10,7 @@ This project targets `ESP32-C3`. You can download `ESP Flash Download Tool` from
 
 ### Option 1: Single File
 
-Flash the packaged merged image as a single file.
+Flash the packaged merged image as a single file. 
 
 1. Open `ESP Flash Download Tool`.
 2. Select `ChipType = ESP32-C3`.
