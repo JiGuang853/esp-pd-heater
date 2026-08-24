@@ -94,7 +94,7 @@ float power_limit(float supply_voltage,
         if (supply_voltage > 0.1f && isfinite(resistance_at_20C) && resistance_at_20C > 0.05f) {
             (void)current_temperature; // keep signature stable; temperature is not relied on for limiting.
             p_full_upper = (supply_voltage * supply_voltage) / resistance_at_20C;
-            p_full_upper *= 1.15f; // guard for model error / transient.
+            p_full_upper *= 2.0f; // guard for model error / transient.
         } else {
             // Fallback: assume the heater could be quite powerful at full duty.
             p_full_upper = 250.0f;
