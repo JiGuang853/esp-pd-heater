@@ -25,7 +25,8 @@ static void ina226_task(void *pvParameter) {
     ina226_calibrate(shunt_res_ohm, 15);
     // PWM heater: use faster conversions + moderate averaging so power limiting can react quickly.
     // Internal update time ≈ (Tshunt + Tbus) * AVG = (332us + 332us) * 16 ≈ 10.6ms.
-    ina226_configure(INA226_PERIOD_332us, INA226_AVERAGE_16);
+    ina226_configure(INA226_PERIOD_140us, INA226_AVERAGE_1);
+
 
     bool uv_stop_posted = false;
     float r20_i_ewma_ohm = NAN;
@@ -132,7 +133,8 @@ static void ina226_task(void *pvParameter) {
         }
 
         // When heating is off, slow down to reduce I2C traffic.
-        vTaskDelay(pdMS_TO_TICKS(st.heating.on ? 5 : 200));
+        vTaskDelay(pdMS_TO_TICKS(st.heating.on ? 1 : 200));
+
     }
 }
 
