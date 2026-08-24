@@ -25,7 +25,8 @@ static void ina226_task(void *pvParameter) {
     ina226_calibrate(shunt_res_ohm, 15);
     // PWM heater: use faster conversions + moderate averaging so power limiting can react quickly.
     // Internal update time ≈ (Tshunt + Tbus) * AVG = (332us + 332us) * 16 ≈ 10.6ms.
-    ina226_configure(INA226_PERIOD_140us, INA226_AVERAGE_1);
+    ina226_configure(INA226_PERIOD_140us, INA226_AVERAGE_4);
+
 
 
     bool uv_stop_posted = false;
