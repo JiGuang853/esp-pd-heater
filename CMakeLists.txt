@@ -5,4 +5,4 @@
 cmake_minimum_required(VERSION 3.5)
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(esp-pd-heater)
-idf_build_set_property(COMPILE_OPTIONS "-Wno-incompatible-pointer-types" APPEND)
+idf_build_set_property(COMPILE_OPTIONS "-Wno-incompatible-pointer-types" "-Wno-error=format-truncation" "-Wno-error=format" APPEND)
