@@ -44,7 +44,8 @@ void format_float_to_width(char *result_str, size_t result_str_len, uint8_t widt
 static void pad_numeric_to_width_5(char *dst, size_t dst_len, const char *src) {
     size_t len = strlen(src);
     if (len >= 5) {
-        snprintf(dst, dst_len, "%s", src);
+strncpy(dst, src, dst_len); if (dst_len > 0) dst[dst_len - 1] = '\0';
+
         return;
     }
 
