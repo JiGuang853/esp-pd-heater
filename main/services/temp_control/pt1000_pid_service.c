@@ -217,12 +217,12 @@ if (pid_output_value < 0) pid_output_value = 0;
 
 // 限制占空比变化率，防止瞬时功率冲击
 static float last_pid_output = 0.0f;
-const float max_increase_per_loop = max_output * 0.05f;  // 每次最多增加5%
+const float max_increase_per_loop = max_output * 0.15f;  // 每次最多增加15%
 if (pid_output_value > last_pid_output + max_increase_per_loop) {
     pid_output_value = last_pid_output + max_increase_per_loop;
 }
-if (pid_output_value < last_pid_output - max_increase_per_loop * 2) {
-    pid_output_value = last_pid_output - max_increase_per_loop * 2;  // 下降可以快一点
+if (pid_output_value < last_pid_output - max_increase_per_loop * 3) {
+    pid_output_value = last_pid_output - max_increase_per_loop * 3;  // 下降可以快一点
 }
 last_pid_output = pid_output_value;
 
