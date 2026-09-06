@@ -15,7 +15,7 @@
 #define LEDC_MODE LEDC_LOW_SPEED_MODE
 #define LEDC_CHANNEL LEDC_CHANNEL_3
 #define LEDC_DUTY_RES LEDC_TIMER_10_BIT
-#define LEDC_FREQUENCY (20 * 1000)
+#define LEDC_FREQUENCY (40 * 1000)
 
 static void heater_pwm_task(void *pvParameter) {
     (void)pvParameter;
@@ -53,7 +53,7 @@ static void heater_pwm_task(void *pvParameter) {
             ESP_ERROR_CHECK(ledc_update_duty(LEDC_MODE, LEDC_CHANNEL));
         }
 
-        vTaskDelay(pdMS_TO_TICKS(50));
+        vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
 
