@@ -59,7 +59,7 @@ float power_limit(float supply_voltage,
 
     // Safety margin: avoid intentionally sitting exactly at the limit.
     // Fixed guard so high-power settings don't get penalized by a percentage.
-    const float guard_w = 0.05f;
+        const float guard_w = 0.05f;
     float effective_max_power_final = max_power - guard_w;
     if (effective_max_power_final < 0.0f) effective_max_power_final = 0.0f;
 
@@ -94,7 +94,7 @@ float power_limit(float supply_voltage,
         if (supply_voltage > 0.1f && isfinite(resistance_at_20C) && resistance_at_20C > 0.05f) {
             (void)current_temperature; // keep signature stable; temperature is not relied on for limiting.
             p_full_upper = (supply_voltage * supply_voltage) / resistance_at_20C;
-            p_full_upper *= 1.3f; // guard for model error / transient.
+            p_full_upper *= 1.1f; // guard for model error / transient.
         } else {
             // Fallback: assume the heater could be quite powerful at full duty.
             p_full_upper = 250.0f;
@@ -105,16 +105,16 @@ float power_limit(float supply_voltage,
     }
 
     // Update full-power estimate from measurement when duty is meaningful.
-    if (duty_ratio >= 0.02f && current_power_w >= 0.2f) {
-        float p_full_sample = current_power_w / duty_ratio;
-        if (isfinite(p_full_sample)) {
+   // //  if (duty_ratio >= 0.02f && current_power_w >= 0.2f) {
+    // //     float p_full_sample = current_power_w / duty_ratio;
+    //     if (isfinite(p_full_sample)) {
             // Clamp to a sane range to avoid noise blow-up.
-            if (p_full_sample < effective_max_power_final) p_full_sample = effective_max_power_final;
-            if (p_full_sample > 600.0f) p_full_sample = 600.0f;
-            const float alpha = 0.3f;
-            s_p_full_est_w = (1.0f - alpha) * s_p_full_est_w + alpha * p_full_sample;
-        }
-    }
+      //       if (p_full_sample < effective_max_power_final) p_full_sample = effective_max_power_final;
+      //       if (p_full_sample > 600.0f) p_full_sample = 600.0f;
+       //      const float alpha = 0.3f;
+       //      s_p_full_est_w = (1.0f - alpha) * s_p_full_est_w + alpha * p_full_sample;
+    //    }
+   //  } //
 
     // Compute target cap from estimated full power.
     float cap_target = effective_max_power / s_p_full_est_w;
@@ -129,10 +129,10 @@ if (current_power_w > max_power_now && duty_ratio > 0.0f) {
     cap_backoff = fminf(fmaxf(cap_backoff, 0.0f), 1.0f);
     if (cap_backoff < cap_target) cap_target = cap_backoff;
     // 超功率说明满功率估计偏小，立刻修正估计值
-    float p_full_measured = current_power_w / duty_ratio;
-    if (p_full_measured > s_p_full_est_w) {
-        s_p_full_est_w = 0.5f * s_p_full_est_w + 0.5f * p_full_measured;
-    }
+ //   float p_full_measured = current_power_w / duty_ratio;
+ //   if (p_full_measured > s_p_full_est_w) {
+  //      s_p_full_est_w = 0.5f * s_p_full_est_w + 0.5f * p_full_measured;
+  //  }
 }
 
     // Increase with headroom awareness (to avoid overshoot due to sensing latency), decrease immediately.
