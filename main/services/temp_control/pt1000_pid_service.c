@@ -98,6 +98,7 @@ static void pt1000_pid_task(void *pvParameter) {
     double pt1000_resistance;
     float pid_temperature_error;
     float pid_output_value;
+float max_output = 0.0f;
 
     app_state_t st = {0};
     bool last_heating_on = false;
@@ -177,13 +178,16 @@ static void pt1000_pid_task(void *pvParameter) {
                                                 st.heating.pwm_current_duty,
                                                 st.heating.pwm_max_duty,
                                                 soft_start_s);
-            float max_output = (float)st.heating.pwm_max_duty * power_limit_value;
-            if (fabsf(max_output - last_max_output) >= 1.0f) {
-                app_state_lock();
-                g_state.temp.pid.max_output = max_output;
-                app_state_unlock();
-                app_state_update_pid();
-                last_max_output = max_output;
+           max_output = (float)st.heating.pwm_max_duty * power_limit_value;
+
+
+
+app_state_lock();
+g_state.temp.pid.max_output = max_output;
+app_state_unlock();
+app_state_update_pid();
+last_max_output = max_output;
+
             }
 
             app_state_lock();
@@ -212,7 +216,10 @@ static void pt1000_pid_task(void *pvParameter) {
         }
         last_heating_on = heating_on;
 
-        uint32_t pwm_current_duty = (uint32_t)roundf(pid_output_value);
+        if (pid_output_value > max_output) pid_output_value = max_output;
+if (pid_output_value < 0) pid_output_value = 0;
+uint32_t pwm_current_duty = (uint32_t)roundf(pid_output_value);
+
         app_state_lock();
         g_state.temp.pt1000 = pt1000_temp;
         g_state.heating.pwm_current_duty = pwm_current_duty;
