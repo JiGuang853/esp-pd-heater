@@ -40,7 +40,7 @@ lv_obj_set_align( ui_Chart1, LV_ALIGN_CENTER );
 lv_obj_clear_flag( ui_Chart1, LV_OBJ_FLAG_CLICKABLE | LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE );    /// Flags
 lv_chart_set_type( ui_Chart1, LV_CHART_TYPE_LINE);
 lv_chart_set_point_count( ui_Chart1, 121);
-lv_chart_set_range( ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 300);
+lv_chart_set_range( ui_Chart1, LV_CHART_AXIS_PRIMARY_Y, 0, 400);
 lv_chart_set_range( ui_Chart1, LV_CHART_AXIS_SECONDARY_Y, 0, 600);
 lv_chart_set_div_line_count( ui_Chart1, 7, 13);
 lv_chart_set_zoom_x( ui_Chart1, 255);
@@ -682,7 +682,7 @@ lv_label_set_text(ui_Label17,"温度");
 lv_obj_clear_flag( ui_Label17, LV_OBJ_FLAG_PRESS_LOCK | LV_OBJ_FLAG_CLICK_FOCUSABLE | LV_OBJ_FLAG_GESTURE_BUBBLE | LV_OBJ_FLAG_SNAPPABLE | LV_OBJ_FLAG_SCROLLABLE | LV_OBJ_FLAG_SCROLL_ELASTIC | LV_OBJ_FLAG_SCROLL_MOMENTUM | LV_OBJ_FLAG_SCROLL_CHAIN );    /// Flags
 
 ui_SliderSetTemp = lv_slider_create(ui_Container11);
-lv_slider_set_range(ui_SliderSetTemp, 0,300);
+lv_slider_set_range(ui_SliderSetTemp, 0,400);
 lv_slider_set_value( ui_SliderSetTemp, 0, LV_ANIM_OFF);
 if (lv_slider_get_mode(ui_SliderSetTemp)==LV_SLIDER_MODE_RANGE ) lv_slider_set_left_value( ui_SliderSetTemp, 0, LV_ANIM_OFF);
 lv_obj_set_width( ui_SliderSetTemp, 80);
