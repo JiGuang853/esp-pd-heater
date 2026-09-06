@@ -153,10 +153,6 @@ if (current_power_w > max_power_now && duty_ratio > 0.0f) {
         if (cap_target > s_duty_cap + max_inc) cap_target = s_duty_cap + max_inc;
     }
     s_duty_cap = cap_target;
-// 28V以上限制最小占空比10%，防止PWM尖峰触发PD保护
-if (supply_voltage > 26.0f && s_duty_cap > 0.0f && s_duty_cap < 0.10f) {
-    s_duty_cap = 0.10f;
-}
 
     return s_duty_cap;
 }
