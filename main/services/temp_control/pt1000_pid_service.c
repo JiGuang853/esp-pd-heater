@@ -21,7 +21,7 @@
 #define ADC_ATTEN ADC_ATTEN_DB_6
 
 // Control-loop period should remain stable for consistent tuning.
-#define PID_LOOP_PERIOD_MS 100
+#define PID_LOOP_PERIOD_MS 20
 
 static adc_oneshot_unit_handle_t s_adc_handle = NULL;
 static adc_cali_handle_t s_adc_cali_handle = NULL;
@@ -214,7 +214,20 @@ last_max_output = max_output;
 
         if (pid_output_value > max_output) pid_output_value = max_output;
 if (pid_output_value < 0) pid_output_value = 0;
+
+// 限制占空比变化率，防止瞬时功率冲击
+static float last_pid_output = 0.0f;
+const float max_increase_per_loop = max_output * 0.05f;  // 每次最多增加5%
+if (pid_output_value > last_pid_output + max_increase_per_loop) {
+    pid_output_value = last_pid_output + max_increase_per_loop;
+}
+if (pid_output_value < last_pid_output - max_increase_per_loop * 2) {
+    pid_output_value = last_pid_output - max_increase_per_loop * 2;  // 下降可以快一点
+}
+last_pid_output = pid_output_value;
+
 uint32_t pwm_current_duty = (uint32_t)roundf(pid_output_value);
+
 
         app_state_lock();
         g_state.temp.pt1000 = pt1000_temp;
