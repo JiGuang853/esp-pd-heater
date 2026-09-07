@@ -200,29 +200,28 @@ void app_pd_request_max_voltage(void) {
 
         husb238_select_pd(husb238, pd_selections[pd_state.max_voltage]);
         husb238_request_pd(husb238);
-      } else {
+    } else {
         ch32x035_pd_handle_t ch32x035 = (ch32x035_pd_handle_t)pd_state.chip_handle;
         if (ch32x035 == NULL) return;
-        // 强制请求20V，防止CH32X035自动协商到28V PPS
-        app_state_t st = {0};
-        app_state_snapshot(&st);
-        if (st.power.voltage > 21.0f) {
-            // 当前电压超过21V，重新请求20V
-            ESP_LOGI(TAG, "Voltage %.1fV too high, requesting 20V", st.power.voltage);
-            ch32x035_pd_request_voltage(ch32x035, 20);
-            vTaskDelay(pdMS_TO_TICKS(200));
-        } else if (st.power.voltage < 19.0f) {
-            // 还没到20V，逐步升压
-            const uint8_t voltage_steps[] = {9, 12, 15, 20};
-            for (int i = 0; i < sizeof(voltage_steps) / sizeof(voltage_steps[0]); i++) {
-                if (st.power.voltage >= (voltage_steps[i] - 2.0f)) continue;
-                ESP_LOGI(TAG, "Request %dV (current: %.1fV)", voltage_steps[i], st.power.voltage);
-                ch32x035_pd_request_voltage(ch32x035, voltage_steps[i]);
-                vTaskDelay(pdMS_TO_TICKS(100));
+        // 电压映射表
+        const uint8_t voltage_steps[] = {9, 12, 15, 20};
+
+        // 遍历每个电压档位
+        for (int i = 0; i < sizeof(voltage_steps) / sizeof(voltage_steps[0]); i++) {
+            float target_voltage = voltage_steps[i];
+            // 如果当前测量电压已经在目标电压附近或更高，跳过此档位
+            app_state_t st = {0};
+            app_state_snapshot(&st);
+            if (st.power.voltage >= (target_voltage - 2.0f)) {
+                ESP_LOGI(TAG, "Skip %dV (current: %.1fV)", voltage_steps[i], st.power.voltage);
+                continue;
             }
+
+            ESP_LOGI(TAG, "Request %dV (current: %.1fV)", voltage_steps[i], st.power.voltage);
+            ch32x035_pd_request_voltage(ch32x035, voltage_steps[i]);
+            vTaskDelay(pdMS_TO_TICKS(100));
         }
     }
-
 }
 
 bool app_pd_get_info_text_copy(char *out, size_t out_len) {
