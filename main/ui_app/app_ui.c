@@ -498,27 +498,43 @@ static void slider_set_pd_volt_event_cb(lv_event_t *e) {
     if (idx < 0) idx = 0;
     if (idx > 4) idx = 4;
     uint8_t voltage = pd_volt_table[idx];
-    ESP_LOGI(TAG, "Request PD voltage: %dV", voltage);
+    int target_enum = (idx == 4) ? 5 : idx;
 
+    // 读当前实际电压，判断从哪档开始升
+    app_state_t st = {0};
+    app_state_snapshot(&st);
+    float current_v = st.power.voltage;
+    int current_enum = 0;
+    if (current_v >= 19.0f)      current_enum = 5;
+    else if (current_v >= 17.0f) current_enum = 4;
+    else if (current_v >= 14.0f) current_enum = 3;
+    else if (current_v >= 11.0f) current_enum = 2;
+    else if (current_v >= 8.0f)  current_enum = 1;
+    else                         current_enum = 0;
 
-    int volt_idx = 0;
-    switch (voltage) {
-        case 5:  volt_idx = 0; break;
-        case 9:  volt_idx = 1; break;
-        case 12: volt_idx = 2; break;
-        case 15: volt_idx = 3; break;
-        case 20: volt_idx = 5; break;
+    ESP_LOGI(TAG, "PD: target=%dV enum=%d, current=%.1fV enum=%d",
+             voltage, target_enum, current_v, current_enum);
+
+    if (target_enum > current_enum) {
+        // 升压：逐步升，每档等150ms
+        for (int i = current_enum + 1; i <= target_enum; i++) {
+            bool ret = app_pd_request_voltage((pd_voltage_t)i);
+            ESP_LOGI(TAG, "  step enum=%d -> %s", i, ret ? "OK" : "FAIL");
+            vTaskDelay(pdMS_TO_TICKS(150));
+        }
+    } else {
+        // 降压：直接降
+        bool ret = app_pd_request_voltage((pd_voltage_t)target_enum);
+        ESP_LOGI(TAG, "  direct enum=%d -> %s", target_enum, ret ? "OK" : "FAIL");
     }
-    app_pd_request_voltage((pd_voltage_t)volt_idx);
+
     char buf[16];
     snprintf(buf, sizeof(buf), "%dV", voltage);
     bsp_display_lock(0);
     lv_label_set_text(ui_LabelSetPDVolt, buf);
     bsp_display_unlock();
-    bool ret = app_pd_request_voltage((pd_voltage_t)volt_idx);
-ESP_LOGI(TAG, "Request PD voltage: %dV, result: %s", voltage, ret ? "OK" : "FAIL");
-
 }
+
 
 static void create_pd_voltage_slider(lv_obj_t *parent) {
     lv_obj_t *cont = lv_obj_create(parent);
