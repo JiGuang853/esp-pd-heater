@@ -486,6 +486,83 @@ static void slider_set_min_volt_event_cb(lv_event_t *e) {
     lv_label_set_text(ui_LabelSetMinVolt, buf_set_min_volt);
     bsp_display_unlock();
 }
+/* ========== PD电压选择按钮 ========== */
+static lv_obj_t *btn_volt_5v = NULL;
+static lv_obj_t *btn_volt_9v = NULL;
+static lv_obj_t *btn_volt_12v = NULL;
+static lv_obj_t *btn_volt_15v = NULL;
+static lv_obj_t *btn_volt_20v = NULL;
+static lv_obj_t *label_volt_status = NULL;
+
+static void volt_button_event_cb(lv_event_t *e) {
+    lv_obj_t *btn = lv_event_get_target(e);
+    if (lv_event_get_code(e) != LV_EVENT_CLICKED) return;
+
+    int voltage = (int)(intptr_t)lv_event_get_user_data(e);
+    ESP_LOGI("UI", "Request PD voltage: %dV", voltage);
+
+    // 映射到pd_voltage_t枚举: 0=5V,1=9V,2=12V,3=15V,4=18V,5=20V
+    int volt_idx = 0;
+    switch (voltage) {
+        case 5:  volt_idx = 0; break;
+        case 9:  volt_idx = 1; break;
+        case 12: volt_idx = 2; break;
+        case 15: volt_idx = 3; break;
+        case 20: volt_idx = 5; break;
+        default: volt_idx = 0; break;
+    }
+    app_pd_request_voltage((pd_voltage_t)volt_idx);
+
+    // 更新状态显示
+    char buf[32];
+    snprintf(buf, sizeof(buf), "PD: %dV", voltage);
+    bsp_display_lock(0);
+    lv_label_set_text(label_volt_status, buf);
+    bsp_display_unlock();
+}
+
+static void create_voltage_buttons(lv_obj_t *parent) {
+    // 标题
+    lv_obj_t *title = lv_label_create(parent);
+    lv_label_set_text(title, "PD电压选择");
+    lv_obj_set_width(title, lv_pct(100));
+    lv_obj_set_style_text_align(title, LV_TEXT_ALIGN_CENTER, 0);
+
+    // 按钮容器
+    lv_obj_t *btn_row = lv_obj_create(parent);
+    lv_obj_remove_style_all(btn_row);
+    lv_obj_set_width(btn_row, lv_pct(100));
+    lv_obj_set_height(btn_row, 30);
+    lv_obj_set_flex_flow(btn_row, LV_FLEX_FLOW_ROW);
+    lv_obj_set_flex_align(btn_row, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    // 创建5个按钮
+    struct { int volt; const char *label; } volts[] = {
+        {5, "5V"}, {9, "9V"}, {12, "12V"}, {15, "15V"}, {20, "20V"}
+    };
+    lv_obj_t *btns[5];
+    for (int i = 0; i < 5; i++) {
+        btns[i] = lv_btn_create(btn_row);
+        lv_obj_set_width(btns[i], 40);
+        lv_obj_set_height(btns[i], 25);
+        lv_obj_t *label = lv_label_create(btns[i]);
+        lv_label_set_text(label, volts[i].label);
+        lv_obj_center(label);
+        lv_obj_add_event_cb(btns[i], volt_button_event_cb, LV_EVENT_CLICKED,
+                            (void *)(intptr_t)volts[i].volt);
+    }
+    btn_volt_5v = btns[0];
+    btn_volt_9v = btns[1];
+    btn_volt_12v = btns[2];
+    btn_volt_15v = btns[3];
+    btn_volt_20v = btns[4];
+
+    // 状态显示
+    label_volt_status = lv_label_create(parent);
+    lv_label_set_text(label_volt_status, "PD: --");
+    lv_obj_set_width(label_volt_status, lv_pct(100));
+    lv_obj_set_style_text_align(label_volt_status, LV_TEXT_ALIGN_CENTER, 0);
+}
 
 static void slider_set_soft_start_time_event_cb(lv_event_t *e) {
     lv_obj_t *slider = lv_event_get_target(e);
