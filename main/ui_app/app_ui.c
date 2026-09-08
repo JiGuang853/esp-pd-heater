@@ -499,6 +499,9 @@ static void slider_set_pd_volt_event_cb(lv_event_t *e) {
     if (idx > 4) idx = 4;
     uint8_t voltage = pd_volt_table[idx];
     ESP_LOGI(TAG, "Request PD voltage: %dV", voltage);
+    bool ret = app_pd_request_voltage((pd_voltage_t)volt_idx);
+ESP_LOGI(TAG, "Request PD voltage: %dV, result: %s", voltage, ret ? "OK" : "FAIL");
+
     int volt_idx = 0;
     switch (voltage) {
         case 5:  volt_idx = 0; break;
