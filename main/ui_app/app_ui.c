@@ -499,8 +499,7 @@ static void slider_set_pd_volt_event_cb(lv_event_t *e) {
     if (idx > 4) idx = 4;
     uint8_t voltage = pd_volt_table[idx];
     ESP_LOGI(TAG, "Request PD voltage: %dV", voltage);
-    bool ret = app_pd_request_voltage((pd_voltage_t)volt_idx);
-ESP_LOGI(TAG, "Request PD voltage: %dV, result: %s", voltage, ret ? "OK" : "FAIL");
+
 
     int volt_idx = 0;
     switch (voltage) {
@@ -516,6 +515,9 @@ ESP_LOGI(TAG, "Request PD voltage: %dV, result: %s", voltage, ret ? "OK" : "FAIL
     bsp_display_lock(0);
     lv_label_set_text(ui_LabelSetPDVolt, buf);
     bsp_display_unlock();
+    bool ret = app_pd_request_voltage((pd_voltage_t)volt_idx);
+ESP_LOGI(TAG, "Request PD voltage: %dV, result: %s", voltage, ret ? "OK" : "FAIL");
+
 }
 
 static void create_pd_voltage_slider(lv_obj_t *parent) {
