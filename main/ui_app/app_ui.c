@@ -849,6 +849,8 @@ void app_lvgl_display(void) {
     lv_obj_add_event_cb(ui_Chart1, chart_draw_event_cb, LV_EVENT_DRAW_PART_BEGIN, NULL);
     lv_group_add_obj(g, ui_ButtonChartRestart);
     lv_obj_add_event_cb(ui_ButtonChartRestart, chart_clicked_event_cb, LV_EVENT_CLICKED, NULL);
+    // 创建PD电压选择按钮（放在设置页面Page4）
+    create_voltage_buttons(ui_ContainerPage4);
 
     // REFLOW
     // Important: LVGL chart enters "crowded mode" when point_cnt >= chart_width_px, and in that mode it won't send
